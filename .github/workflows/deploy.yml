@@ -27,4 +27,4 @@ jobs:
       - name: Deploy code to EC2 instance
         run: |
           sudo rsync -r --delete-after ${{ github.workspace }}/ /var/www/html/
-          ssh ubuntu@ec2-13-233-237-55.ap-south-1.compute.amazonaws.com 'sudo chown -R www-data:www-data /var/www/html'
+          ssh ubuntu@15.206.122.146 'sudo chown -R www-data:www-data /var/www/html'
