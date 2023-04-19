@@ -28,9 +28,10 @@ jobs:
           script: |
             cd /var/www/html
             sudo rm -rf *
-            sudo git clone https://github.com/Devmoweb/clientwebsite.git
-            sudo mv clientwebsite/* .
-            sudo rm -rf clientwebsite/
+            sudo git clone https://github.com/Devmoweb/clientwebsite.git tmp
+            sudo mv tmp/* .
+            sudo rm -rf tmp
+          
       - name: Verify deployment
         run: |
           curl http://13.127.190.236
