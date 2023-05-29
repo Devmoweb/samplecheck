@@ -1,37 +1,26 @@
-name: Deploy to EC2
+name: Build
 
 on:
   push:
     branches:
       - main
 
-env:
-  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 jobs:
-  deploy:
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Configure SSH key
-        uses: webfactory/ssh-agent@v0.4.0
+      - uses: actions/checkout@v2
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: Add SSH key to agent
-        run: ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
-      - name: Connect to EC2 instance
-        uses: appleboy/ssh-action@master
-        with:
-          host: 13.127.190.236
-          username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
-            cd /var/www/html
-            sudo rm -rf *
-            sudo git clone https://github.com/Devmoweb/clientwebsite.git tmp
-            sudo mv tmp/* .
-            sudo rm -rf tmp
-          
-      - name: Verify deployment
-        run: |
-          curl http://13.127.190.236
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      # If you wish to fail your job when the Quality Gate is red, uncomment the
+      # following lines. This would typically be used to fail a deployment.
+      - uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
